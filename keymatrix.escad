@@ -1,0 +1,26 @@
+use <dcs.escad>;
+use <switch_cutout.escad>;
+
+module keyfunc(keytype) {
+    if(keytype == "dcs_r2") {
+        dcs_r2();
+    }
+    if(keytype == "switch_cutout") {
+        switch_cutout();
+    }
+}
+
+
+module keymatrix(keytype = "dcs_r2", rows = 3, columns = 3){
+    union(){
+        for(r = [0:rows-1]){
+            for(c = [0:columns-1]){
+                translate( [keydist*c, keydist*r] ){
+                    keyfunc(keytype);
+                }
+            }
+        }
+
+    }
+}
+

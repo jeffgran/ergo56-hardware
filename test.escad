@@ -1,0 +1,33 @@
+use <keymatrix.escad>;
+$res = 0.5;
+
+
+// x(columns), y(rows), translate x, translate y, rotate
+keys = [
+    [2, 3, 0, 0, 0],
+    [1, 4, 2, -0.66, 0],
+    [1, 4, 3, -0.33, 0],
+    [2, 3, 4, (-0.33 + 1), 0]
+];
+
+
+module keyplate(keys) {
+    union(){
+        translate( [0, 0, 5.6] )
+        for(m = keys) {
+            translate([keydist * m[2], keydist * m[3]]){
+                keymatrix(keytype = "dcs_r2", columns = m[0], rows = m[1]);
+            }
+        }
+        difference(){
+            cube([150, 80, 1.5]);
+            for(m = keys) {
+                translate([keydist * m[2], keydist * m[3]]){
+                    keymatrix(keytype = "switch_cutout", columns = m[0], rows = m[1]);
+                }
+            }
+        }
+    }
+    
+}
+keyplate(keys);

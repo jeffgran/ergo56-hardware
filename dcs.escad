@@ -1,0 +1,34 @@
+// DCS Row 2 key:
+// actual length and width: 0.71875 inch (3/4 - 1/32)
+// == 18.25625 mm
+// 3/4 is 19.0500 mm (total space required per key)
+// top is ~ 13mm wide x 14mm deep
+
+keydist = 19.05;    
+
+module dcs_keyshape(topwidth, botwidth, keyheight) {
+    
+    scalemult = ((1 - (topwidth/botwidth)) / keyheight);
+    //echo(scalemult);
+
+    linear_extrude( height = (keyheight), scale(h) = (1 - (h * scalemult)) ) {
+        square( size = botwidth, r = 1, center = true );
+    }
+
+}
+
+module dcs_full_keycap(topwidth, botwidth, keyheight){
+    translate( [botwidth / 2, botwidth / 2, 0] ) { // recenter
+        difference(){
+            dcs_keyshape(topwidth, botwidth, keyheight);
+            scale( [0.9, 0.9, 0.9] ) {
+                dcs_keyshape(topwidth, botwidth, keyheight);
+            }
+        }
+        
+    }
+}
+
+module dcs_r2() {
+    dcs_full_keycap(topwidth = 14, botwidth = 18.25625, keyheight = 9);
+}
