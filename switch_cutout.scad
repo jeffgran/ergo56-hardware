@@ -1,8 +1,9 @@
-use <dcs.escad>;
+use <dcs.scad>;
 
-module switch_cutout(){
-    offset = ((keydist - 14) / 2);
-    translate( [offset, offset, 0] ){
+module switch_cutout( x, y ){
+    xoffset = (((keydist * x) - 14) / 2);
+    yoffset = (((keydist * y) - 14) / 2);
+    translate( [xoffset, yoffset, 0] ){
         union(r = 0){
             linear_extrude(height = 2){
                 square( size = [14,14], r = 0.2 );
