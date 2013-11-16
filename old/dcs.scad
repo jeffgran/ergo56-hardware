@@ -21,8 +21,8 @@ module dcs_keyshape( topwidth, botwidth, keyheight, x, y ) {
         linear_extrude(height = 0.01){
             square( size = [botwidth * x, botwidth * y], r = 1, center = true );
         }
-        translate( [0, 0, keyheight - 0.02] ) {
-            linear_extrude(height = 0.01){
+        translate( [0, 0, keyheight - 0.01] ) {
+            linear_extrude( height = 0.01 ){
                 square( size = [topwidth * x, topwidth * y], r = 1, center = true );
             }
         }
@@ -47,3 +47,5 @@ module dcs_full_keycap( topwidth, botwidth, keyheight, x, y ){
 module dcs_r2( x = 1, y = 1 ) {
     dcs_full_keycap( topwidth = 14, botwidth = 18.25625, keyheight = 9, x = x, y = y );
 }
+
+dcs_r2();

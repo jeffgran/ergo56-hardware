@@ -48,5 +48,30 @@ base = [
     [-10, 70] // top left
 ];
 
-keyplate( keys, base );
-    
+
+
+
+union(){
+    keyplate( keys, base );
+
+    // base piece
+    difference() {
+        translate( [0, 0, -12] ) {
+            linear_extrude( height = 11.95 ) {
+                polygon( base );
+            }
+        }
+
+        
+        translate( [0, 0, -11] ) {
+            linear_extrude( height = 10.95 ) {
+                border_shrink(3) {
+                    polygon( base );
+                }
+            }
+        }
+        
+        
+    }
+}
+
