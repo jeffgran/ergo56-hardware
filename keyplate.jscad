@@ -1,72 +1,90 @@
 include("dcs.jscad");
 
 
-// module keyfunc( keytype, x = 1, y = 1 ) {
-//     //echo(keytype);
-//     if(keytype == "dcs_r2") {
-//         dcs_r2( x, y );
-//     }
+Keyplate = function(vertices) {
 
-//     if(keytype == "switch_cutout") {
-//         switch_cutout( x, y );
-//     }
+  var plateshape = polygon(vertices);
+  //if (arguments.length == 1 || undefined === tag) tag = '';
+  
+  var $plate = plateshape.extrude({offset: [0, 0, 1.5]});
 
-//     // not implemented...
-//     if(keytype == "dsa") {
-//         dsa();
-//     }
-// }
-
-// // x and y are multipliers for 1.5x, 2x keys etc.
-// // all "keys" in the matrix will be the same
-// module matrix( keytype, rows, columns, x, y ) {
-//     union(){
-//         for(r = [0:rows-1]){
-//             for(c = [0:columns-1]){
-//                 translate( [keydist*c, keydist*r] ){
-//                     keyfunc( keytype, x, y );
-//                 }
-//             }
-//         }
-//     }    
-// }
+  $plate.properties.shape = plateshape;
+  $plate.properties.all_keys = null;
+  $plate.properties.all_cutouts = null;
 
 
-Keyplate = function() {
-  var all_keys;
-  var all_cutouts;
+  var self = $plate;
+  
+  $plate.get_plate = function(opts) {
+    var ret = $plate.subtract($plate.all_cutouts()).setColor([1,1,1]);
 
-  this.keys = function(){
-    return all_keys;
-  }
-
-  this.cutouts = function(){
-    return all_cutouts;
+    if (opts['keycaps'] == true) {
+      return union.apply(this, [ret, $plate.all_keys()]);
+    } else {
+      return ret;
+    }
   }
   
-  this.add_grid = function(options){
+  
+  $plate.add_grid = function(options){
     var key = options['key'];
     var cutout = key.properties.cutout_shape;
 
     
-    var keys = make_grid(key, options);
-    if (all_keys !== undefined) {
-      all_keys = union.apply(this, [all_keys, keys]);
+    var keys = $plate.make_grid(key, options).translate([0,0,5.6]).setColor([0.6,0.75,1]);;
+    if ($plate.properties.all_keys !== null) {
+      $plate.properties.all_keys = union.apply(this, [$plate.properties.all_keys, keys]);
     } else {
-      all_keys = keys;
+      $plate.properties.all_keys = keys;
     }
     
-    var cutouts = make_grid(cutout, options);
-    if (all_cutouts !== undefined) {
-      all_cutouts = union.apply(this, [all_cutouts, cutouts]);
+    var cutouts = $plate.make_grid(cutout, options).setColor([0,0.75,0]);;
+    if ($plate.properties.all_cutouts !== null) {
+      $plate.properties.all_cutouts = union.apply(this, [$plate.properties.all_cutouts, cutouts]);
     } else {
-      all_cutouts = cutouts;
+      $plate.properties.all_cutouts = cutouts;
     }
     
   }
 
+  $plate.add_rail = function(options) {
+    var height = options['height'];
+    var width = options['width'];
+    var translation = options['translation']
+    
+    if (width) {
+      poly = polygon([
+        [0,-0.75],
+        [(width*19.05),-0.75],
+        [(width*19.05),0.75],
+        [0,0.75]
+      ])
+    } else if (height) {
+      poly = polygon([
+        [-0.75,0],
+        [-0.75,(height*19.05)],
+        [0.75,(height*19.05)],
+        [0.75, 0]
+      ]);
+    }
+    rail = poly.extrude({offset: [0,0,-3]})
+    if (translation) {
+      rail = rail.translate([
+        translation[0] * 19.05,
+        translation[1] * 19.05,
+        translation[2] * 19.05
+      ]);
+    }
+    if ($plate.properties.all_rails !== undefined) {
+      $plate.properties.all_rails = $plate.properties.all_rails.union(rail);
+    } else {
+      $plate.properties.all_rails = rail;
+    }
+  }
+
+  
   // private
-  var make_grid = function(obj, options) {
+  $plate.make_grid = function(obj, options) {
     var key = options['key'];
     var rows = options['rows'];
     var columns = options['columns'];
@@ -74,8 +92,8 @@ Keyplate = function() {
     var rotation = options['rotation'];
     
     var objs = [];
-    for (i = 0; i < rows; i++) {
-      for (j = 0; j < columns; j++) {
+    for (i = 0; i < columns; i++) {
+      for (j = 0; j < rows; j++) {
         objs.push(obj.translate([key.properties.width * i, key.properties.height * j, 0]));
       }
     }
@@ -98,4 +116,5 @@ Keyplate = function() {
     
     return the_grid;
   }
+  return $plate
 }

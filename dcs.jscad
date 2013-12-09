@@ -22,14 +22,13 @@ DCS = function() {
   this.keydist = keydist;
   DCS.keydist = keydist;
   
-  DCS.cutout_shape = (function() {
-    // 100mm high so that it will always(?) be thick enough to cut through whatever plate you're making
-    var main = CSG.cube({radius: [7, 7, 100]});
-    var post1 = CSG.cube({radius: [7.8, 1.5, 100]}).translate([0, 5, 0]);
-    var post2 = CSG.cube({radius: [7.8, 1.5, 100]}).translate([0, -5, 0]);
+  this.cutout_shape = function(x, y) {
+    var main = CSG.cube({radius: [7, 7, 3]});
+    var post1 = CSG.cube({radius: [7.9, 1.5, 3]}).translate([0, 4.9, 0]);
+    var post2 = CSG.cube({radius: [7.9, 1.5, 3]}).translate([0, -4.9, 0]);
     var all = union.apply(this, [main, post1, post2]);
-    return all.translate([keydist/2, keydist/2, 0]);
-  })();
+    return all.translate([(keydist*x)/2, (keydist*y)/2, 0]);
+  }
 
   var dcs_keyshape = function( topwidth, botwidth, keyheight, x, y ) {
     
@@ -66,7 +65,7 @@ DCS = function() {
     combined.properties.y = y;
     
     combined.properties.keydist = DCS.keydist;
-    combined.properties.cutout_shape = DCS.cutout_shape;
+    combined.properties.cutout_shape = self.cutout_shape(x, y);
     
     return combined;
   };
